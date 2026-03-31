@@ -107,6 +107,24 @@ export const ARTICLES: Article[] = [
     visualTags: ["Token Flow Mind Map", "Code Compare", "Naming Game"],
   },
   {
+    id: "mini-typography-book",
+    title: "Mini Typography Book",
+    subtitle: "Interactive Reference · 15 Chapters",
+    path: "/uiux/typography/mini-typography-book",
+    category: "uiux",
+    subcategory: "Typography",
+    description:
+      "A complete beginner's guide to typography across 15 interactive chapters — from type anatomy and classification to variable fonts, screen rendering, and web best practices. " +
+      "Features a spacing lab, modular scale generator, anatomy hover explorer, 20-event history timeline, and a 29-term flip-card glossary.",
+    tags: ["15 Chapters", "Interactive Labs", "29-Term Glossary"],
+    date: "March 2026",
+    readingTime: "20 min",
+    accent: "#374151",
+    accentLight: "#F3F4F6",
+    coverPattern: "flow",
+    visualTags: ["Anatomy Explorer", "Modular Scale Lab", "Variable Font Sliders"],
+  },
+  {
     id: "color-encyclopedia",
     title: "Color Encyclopedia",
     subtitle: "Interactive Color Science Reference · 20 Systems",
