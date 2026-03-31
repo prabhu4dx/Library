@@ -107,6 +107,25 @@ export const ARTICLES: Article[] = [
     visualTags: ["Token Flow Mind Map", "Code Compare", "Naming Game"],
   },
   {
+    id: "font-anatomy-explorer",
+    title: "Font Anatomy Explorer",
+    subtitle: "Interactive Typography Lab · 25 Google Fonts",
+    path: "/uiux/typography/tools/anatomy-explorer",
+    category: "uiux",
+    subcategory: "Typography",
+    description:
+      "A live canvas lab for exploring the geometric anatomy of 25 Google Fonts. " +
+      "Drag the five reference lines — ascender, cap height, x-height, baseline, descender — to reshape proportions, " +
+      "and an algorithm instantly ranks every other font by anatomical similarity. Includes side-by-side comparison, x-height ratio analysis, and per-font personality intelligence.",
+    tags: ["25 Google Fonts", "Drag & Discover", "Anatomy Canvas"],
+    date: "March 2026",
+    readingTime: "20 min",
+    accent: "#5C3520",
+    accentLight: "#F5EDE4",
+    coverPattern: "dims",
+    visualTags: ["Draggable Reference Lines", "Font Match Engine", "25-Font Library"],
+  },
+  {
     id: "mini-typography-book",
     title: "Mini Typography Book",
     subtitle: "Interactive Reference · 15 Chapters",
