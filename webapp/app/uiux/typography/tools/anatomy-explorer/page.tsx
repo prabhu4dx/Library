@@ -571,8 +571,22 @@ function AnatomyCanvas({
     metrics, activeKey, onLineDrag, draggedPositions, compare, cmpFont, cmpMetrics,
 }) {
     const ref = useRef(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [canvasWidth, setCanvasWidth] = useState(820);
     const dragging = useRef(null);
     const height = metrics ? Math.max(280, metrics.ascender + metrics.descender + 120) : 280;
+
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const ro = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                setCanvasWidth(Math.floor(entry.contentRect.width));
+            }
+        });
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, []);
 
     // Compute line Y positions from metrics + user overrides
     const getLineY = useCallback((m, H) => {
@@ -590,9 +604,9 @@ function AnatomyCanvas({
     // Draw
     useEffect(() => {
         const cv = ref.current;
-        if (!cv || !metrics) return;
+        if (!cv || !metrics || canvasWidth === 0) return;
         const ctx = cv.getContext("2d");
-        const W = cv.width, H = cv.height;
+        const W = canvasWidth, H = cv.height;
         ctx.clearRect(0, 0, W, H);
 
         // bg
@@ -607,9 +621,9 @@ function AnatomyCanvas({
 
         // dot grid
         if (showGrid) {
-            ctx.fillStyle = bgDark ? "rgba(255,230,180,0.06)" : "rgba(90,50,20,0.06)";
+            ctx.fillStyle = bgDark ? "rgba(255,230,180,0.25)" : "rgba(90,50,20,0.18)";
             for (let x = 22; x < W; x += 26) for (let y = 22; y < H; y += 26) {
-                ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x, y, 1.2, 0, Math.PI * 2); ctx.fill();
             }
         }
 
@@ -618,10 +632,10 @@ function AnatomyCanvas({
         // zone fills
         if (showLines) {
             const zones = [
-                ["ascender", "capHeight", "rgba(107,63,160,0.04)"],
-                ["capHeight", "xHeight", "rgba(31,107,64,0.04)"],
-                ["xHeight", "baseline", "rgba(26,79,160,0.055)"],
-                ["baseline", "descender", "rgba(160,112,32,0.04)"],
+                ["ascender", "capHeight", bgDark ? "rgba(107,63,160,0.20)" : "rgba(107,63,160,0.12)"],
+                ["capHeight", "xHeight", bgDark ? "rgba(31,107,64,0.20)" : "rgba(31,107,64,0.12)"],
+                ["xHeight", "baseline", bgDark ? "rgba(26,79,160,0.25)" : "rgba(26,79,160,0.15)"],
+                ["baseline", "descender", bgDark ? "rgba(160,112,32,0.20)" : "rgba(160,112,32,0.12)"],
             ];
             zones.forEach(([a, b, col]) => {
                 const y1 = ly[a], y2 = ly[b];
@@ -636,15 +650,18 @@ function AnatomyCanvas({
         const tmW = ctx.measureText(specimen).width;
         const textX = compare ? 36 : (W - tmW) / 2;
 
-        if (bgDark) { ctx.shadowColor = "rgba(255,200,100,0.20)"; ctx.shadowBlur = 20; }
-        ctx.fillStyle = bgDark ? "rgba(255,248,235,0.92)" : C.c0;
+        if (bgDark) {
+            ctx.shadowColor = "rgba(255,200,100,0.5)";
+            ctx.shadowBlur = 30;
+        }
+        ctx.fillStyle = bgDark ? "#F8F5F0" : "#1E0F06";
         ctx.fillText(specimen, textX, baseY);
         ctx.shadowBlur = 0;
 
         if (compare && cmpFont && cmpMetrics) {
             const baseY2 = (H - cmpMetrics.ascender - cmpMetrics.descender) / 2 + cmpMetrics.ascender;
             ctx.font = `400 ${fontSize}px "${cmpFont.name}"`;
-            ctx.fillStyle = bgDark ? "rgba(200,160,100,0.68)" : C.c4;
+            ctx.fillStyle = bgDark ? "rgba(255,248,240,0.9)" : C.c4;
             ctx.fillText(specimen, textX + tmW + 48, baseY2);
         }
 
@@ -652,39 +669,44 @@ function AnatomyCanvas({
         if (showLines) {
             LINE_META.forEach(({ key }) => {
                 const y = ly[key], col = LC[key], isBase = key === "baseline", isAct = activeKey === key;
+                const lineColor = bgDark ? "#F8F5F0" : col;  // Warm white in dark mode
+                const glowColor = bgDark ? "rgba(255,248,240,0.8)" : col;
                 ctx.save();
                 ctx.setLineDash(isBase ? [] : [7, 5]);
-                ctx.strokeStyle = col;
-                ctx.lineWidth = isAct ? 2.2 : (isBase ? 1.5 : 1);
-                ctx.globalAlpha = isAct ? 1 : (isBase ? 0.65 : 0.42);
-                if (isAct) { ctx.shadowColor = col; ctx.shadowBlur = 8; }
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = isAct ? 2.8 : (isBase ? 2.2 : 1.5);
+                ctx.globalAlpha = isAct ? 1 : (isBase ? 0.9 : 0.8);
+                if (isAct || bgDark) { ctx.shadowColor = glowColor; ctx.shadowBlur = isAct ? 12 : 6; }
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
                 ctx.shadowBlur = 0; ctx.restore();
 
                 // tick marks
                 ctx.save();
-                ctx.strokeStyle = col; ctx.lineWidth = isAct ? 2 : 1; ctx.globalAlpha = isAct ? 0.9 : 0.42;
-                [10, W - 10].forEach(tx => { ctx.beginPath(); ctx.moveTo(tx, y - 5); ctx.lineTo(tx, y + 5); ctx.stroke(); });
-                ctx.restore();
+                ctx.strokeStyle = lineColor; ctx.lineWidth = isAct ? 2.5 : 1.8; ctx.globalAlpha = isAct ? 1 : 0.8;
+                if (bgDark) ctx.shadowColor = glowColor, ctx.shadowBlur = 4;
+                [10, W - 10].forEach(tx => { ctx.beginPath(); ctx.moveTo(tx, y - 7); ctx.lineTo(tx, y + 7); ctx.stroke(); });
+                ctx.shadowBlur = 0; ctx.restore();
 
                 // drag handle — circle on left side
                 ctx.save();
-                ctx.fillStyle = isAct ? col : "rgba(255,252,248,0.9)";
-                ctx.strokeStyle = col; ctx.lineWidth = isAct ? 2 : 1.5; ctx.globalAlpha = isAct ? 1 : 0.65;
-                ctx.beginPath(); ctx.arc(24, y, isAct ? 6 : 5, 0, Math.PI * 2);
+                ctx.fillStyle = bgDark ? "rgba(255,252,248,0.95)" : "rgba(255,252,248,0.98)";
+                ctx.strokeStyle = lineColor; ctx.lineWidth = isAct ? 3 : 2.2; ctx.globalAlpha = 1;
+                if (bgDark) ctx.shadowColor = glowColor, ctx.shadowBlur = 6;
+                ctx.beginPath(); ctx.arc(24, y, isAct ? 8 : 7, 0, Math.PI * 2);
                 ctx.fill(); ctx.stroke();
-                ctx.restore();
+                ctx.shadowBlur = 0; ctx.restore();
 
                 // line label
                 ctx.save();
-                ctx.font = `${isAct ? "500" : "400"} 10.5px "IBM Plex Mono",monospace`;
-                ctx.fillStyle = col; ctx.globalAlpha = isAct ? 1 : 0.5;
+                ctx.font = `${isAct ? "500" : "400"} 11px "IBM Plex Mono",monospace`;
+                ctx.fillStyle = lineColor; ctx.globalAlpha = isAct ? 1 : 0.85;
+                if (bgDark) ctx.shadowColor = "rgba(0,0,0,0.5)", ctx.shadowBlur = 4;
                 ctx.textBaseline = "bottom"; ctx.textAlign = "right";
-                ctx.fillText(LINE_META.find(l => l.key === key)?.short, W - 14, y - 4);
-                ctx.restore();
+                ctx.fillText(LINE_META.find(l => l.key === key)?.short, W - 14, y - 6);
+                ctx.shadowBlur = 0; ctx.restore();
             });
         }
-    }, [font, fontSize, bgDark, specimen, showLines, showGrid, metrics, activeKey, draggedPositions, compare, cmpFont, cmpMetrics, getLineY]);
+    }, [font, fontSize, bgDark, specimen, showLines, showGrid, metrics, activeKey, draggedPositions, compare, cmpFont, cmpMetrics, getLineY, canvasWidth]);
 
     // Drag interaction
     const getHitLine = useCallback((y, H) => {
@@ -731,13 +753,15 @@ function AnatomyCanvas({
     }, [metrics, getHitLine, onMouseMove]);
 
     return (
-        <canvas ref={ref} width={820} height={height}
-            style={{ width: "100%", height, display: "block", cursor }}
-            onMouseDown={onMouseDown}
-            onMouseMove={onMouseMoveForCursor}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
-        />
+        <div ref={containerRef} style={{ width: "100%" }}>
+            <canvas ref={ref} width={canvasWidth} height={height}
+                style={{ width: "100%", height, display: "block", cursor }}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMoveForCursor}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseUp}
+            />
+        </div>
     );
 }
 
