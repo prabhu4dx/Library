@@ -231,6 +231,14 @@ The card will automatically show in:
 
 ---
 
+## Step 7 - Git Push
+
+After everything is done, run the following commands:
+
+```
+git push
+```
+
 ## Quick Summary Checklist
 
 ```

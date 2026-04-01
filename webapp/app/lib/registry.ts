@@ -160,6 +160,24 @@ export const ARTICLES: Article[] = [
     coverPattern: "nodes",
     visualTags: ["8 Interactive Views", "Color Lab", "Timeline 1931–2025"],
   },
+  {
+    id: "dsa-codex-rose-book",
+    title: "The DSA Codex",
+    subtitle: "Interactive Algorithm Reference · 8 Data Structures",
+    path: "/computer-science/dsa/rose-book",
+    category: "ai",
+    subcategory: "Computer Science",
+    description:
+      "A digital simulation book exploring 8 fundamental data structures — from arrays and hash tables to heaps and graphs. " +
+      "Features interactive simulators, a 2300-year algorithmic timeline, and visual deep-dives into complexity and patterns.",
+    tags: ["8 Data Structures", "Interactive Simulators", "2300-Year Timeline"],
+    date: "April 2026",
+    readingTime: "20 min",
+    accent: "#9E2B4A",
+    accentLight: "#FBF2F5",
+    coverPattern: "flow",
+    visualTags: ["Live Simulators", "Algorithmic Timeline", "Complexity Explorer"],
+  },
 ];
 
 export const CATEGORY_META: Record<
