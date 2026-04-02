@@ -1,133 +1,22 @@
 "use client";
-import { useState } from "react";
+
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import Nav from "@/app/components/Nav";
-import { ARTICLES, CATEGORY_META, type Article } from "@/app/lib/registry";
-
-function ArticleRow({ article }: { article: Article }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <Link
-      href={article.path}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: "grid",
-        gridTemplateColumns: "200px 1fr",
-        background: "white",
-        borderRadius: 14,
-        overflow: "hidden",
-        border: "1px solid var(--border)",
-        boxShadow: hovered ? "var(--shadow-lg)" : "var(--shadow-sm)",
-        transform: hovered ? "translateY(-3px)" : "translateY(0)",
-        transition: "box-shadow 0.25s ease, transform 0.25s var(--ease-spring)",
-        textDecoration: "none",
-      }}
-    >
-      {/* Left accent strip */}
-      <div
-        style={{
-          background: `linear-gradient(160deg, ${article.accentLight} 0%, ${article.accent}22 100%)`,
-          position: "relative",
-          overflow: "hidden",
-          minHeight: 120,
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            bottom: 16,
-            left: 16,
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: "0.07em",
-            textTransform: "uppercase",
-            color: article.accent,
-            fontFamily: "var(--font-body)",
-          }}
-        >
-          {article.subcategory}
-        </div>
-      </div>
-
-      {/* Right text */}
-      <div style={{ padding: "24px 28px" }}>
-        <h2
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 20,
-            fontWeight: 700,
-            lineHeight: 1.3,
-            letterSpacing: "-0.01em",
-            color: "var(--text-1)",
-            marginBottom: 8,
-          }}
-        >
-          {article.title}
-        </h2>
-        <p
-          style={{
-            fontSize: 13.5,
-            lineHeight: 1.65,
-            color: "var(--text-2)",
-            fontFamily: "var(--font-body)",
-            marginBottom: 16,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {article.description}
-        </p>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {article.tags.map((t) => (
-            <span
-              key={t}
-              style={{
-                fontSize: 11,
-                padding: "3px 8px",
-                borderRadius: 4,
-                background: "var(--paper)",
-                border: "1px solid var(--border)",
-                color: "var(--text-3)",
-                fontFamily: "var(--font-body)",
-              }}
-            >
-              {t}
-            </span>
-          ))}
-          <span
-            style={{
-              marginLeft: "auto",
-              fontSize: 11,
-              color: "var(--text-3)",
-              fontFamily: "var(--font-body)",
-              alignSelf: "center",
-            }}
-          >
-            {article.readingTime} read
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
+import { ARTICLES, CATEGORY_META } from "../lib/registry";
+import ArticleCard, { ViewMode } from "../components/ArticleCard";
 
 export default function AiPage() {
+  const [viewMode, setViewMode] = useState<ViewMode>("pillar");
   const articles = ARTICLES.filter((a) => a.category === "ai");
-  const subcategories = [...new Set(articles.map((a) => a.subcategory))];
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--paper)" }}>
-      <Nav />
-
       {/* Header */}
       <div
         style={{
-          padding: "56px clamp(20px, 5vw, 48px) 48px",
+          padding: "120px clamp(20px, 5vw, 48px) 64px",
           borderBottom: "1px solid var(--border)",
-          maxWidth: 1200,
+          maxWidth: 1400,
           margin: "0 auto",
         }}
       >
@@ -152,94 +41,85 @@ export default function AiPage() {
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(36px, 5vw, 56px)",
+            fontSize: "clamp(48px, 6vw, 72px)",
             fontWeight: 800,
             letterSpacing: "-0.03em",
             color: "var(--text-1)",
-            lineHeight: 1.15,
-            marginBottom: 16,
+            lineHeight: 1,
+            marginBottom: 24,
           }}
         >
           Artificial Intelligence
         </h1>
         <p
           style={{
-            fontSize: 16,
-            lineHeight: 1.7,
+            fontSize: 18,
+            lineHeight: 1.6,
             color: "var(--text-2)",
             fontFamily: "var(--font-body)",
-            maxWidth: 560,
+            maxWidth: 600,
+            fontWeight: 450,
           }}
         >
           {CATEGORY_META.ai.description}
         </p>
 
-        <div style={{ display: "flex", gap: 8, marginTop: 24, flexWrap: "wrap" }}>
-          {subcategories.map((sub) => (
-            <span
-              key={sub}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 48 }}>
+           <div style={{ display: "flex", background: "white", padding: 4, borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", gap: 4 }}>
+             <button 
+              onClick={() => setViewMode("pillar")}
               style={{
-                fontSize: 11,
-                fontWeight: 600,
-                padding: "4px 12px",
-                borderRadius: 6,
-                background: "white",
-                border: "1px solid var(--border)",
-                color: "var(--text-2)",
-                fontFamily: "var(--font-body)",
-              }}
-            >
-              {sub}
-            </span>
+                padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700,
+                background: viewMode === "pillar" ? "#111" : "transparent",
+                color: viewMode === "pillar" ? "#fff" : "#666",
+                border: "none", cursor: "pointer", transition: "all 0.2s ease",
+              }}>Pillar</button>
+             <button 
+              onClick={() => setViewMode("horizontal")}
+              style={{
+                padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700,
+                background: viewMode === "horizontal" ? "#111" : "transparent",
+                color: viewMode === "horizontal" ? "#fff" : "#666",
+                border: "none", cursor: "pointer", transition: "all 0.2s ease",
+              }}>Bar</button>
+           </div>
+           <div style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 600 }}>
+             {articles.length} Digital Pillars
+           </div>
+        </div>
+      </div>
+
+      {/* Content Grid */}
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "64px clamp(20px, 5vw, 48px) 120px" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: viewMode === "pillar" ? "repeat(auto-fill, minmax(360px, 1fr))" : "1fr",
+          gap: viewMode === "pillar" ? 40 : 20,
+        }}>
+          {articles.map((article) => (
+            <ArticleCard key={article.id} article={article} viewMode={viewMode} />
           ))}
         </div>
       </div>
 
-      {/* Articles */}
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "48px clamp(20px, 5vw, 48px) 80px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 20,
-        }}
-      >
-        {articles.map((article) => (
-          <ArticleRow key={article.id} article={article} />
-        ))}
-      </div>
-
-      <footer
-        style={{
-          borderTop: "1px solid var(--border)",
-          padding: "24px clamp(20px, 5vw, 48px)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Link
-          href="/"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 14,
-            fontWeight: 600,
-            color: "var(--text-1)",
-          }}
-        >
-          ← Library
-        </Link>
-        <span
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: 12,
-            color: "var(--text-3)",
-          }}
-        >
-          {articles.length} articles in AI
-        </span>
+      <footer style={{
+        borderTop: "1px solid var(--border)",
+        padding: "48px clamp(20px, 5vw, 48px) 80px",
+        display: "flex", justifyContent: "space-between", alignItems: "flex-end",
+      }}>
+        <div style={{ maxWidth: 400 }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 24,
+            fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.03em", marginBottom: 12 }}>
+            Library / AI
+          </div>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13.5,
+            color: "var(--text-2)", lineHeight: 1.6 }}>
+            Refined research and analysis in the intersection of intelligence and design. 
+          </p>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <Link href="/" style={{ color: "var(--text-1)", fontWeight: 700, textDecoration: "none" }}>← Back to Index</Link>
+        </div>
       </footer>
     </div>
   );

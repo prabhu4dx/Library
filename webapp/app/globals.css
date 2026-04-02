@@ -66,3 +66,24 @@ body {
 
 /* ── Links ──────────────────────────────────────────────── */
 a { color: inherit; text-decoration: none; }
+
+/* ── Bento Grid Utilities ───────────────────────────────── */
+.bento-normal { grid-column: span 1; }
+.bento-wide { grid-column: span 1; }
+
+@media (min-width: 768px) {
+  .bento-wide { grid-column: span 2; }
+}
+
+/* ── Animations ────────────────────────────────────────── */
+@keyframes wave-mesh {
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33%  { transform: translate(-5%, 5%) scale(1.1) rotate(1deg); }
+  66%  { transform: translate(5%, -5%) scale(1.05) rotate(-1deg); }
+  100% { transform: translate(0, 0) scale(1.1) rotate(0deg); }
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
