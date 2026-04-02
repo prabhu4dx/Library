@@ -178,6 +178,24 @@ export const ARTICLES: Article[] = [
     coverPattern: "flow",
     visualTags: ["Live Simulators", "Algorithmic Timeline", "Complexity Explorer"],
   },
+  {
+    id: "graph-theory-visual-book",
+    title: "Graph Theory — The Complete Visual Book",
+    subtitle: "Interactive Algorithm Reference · 17 Sections",
+    path: "/computer-science/dsa/graph-coffee-icecream-fundamentals",
+    category: "ai",
+    subcategory: "Computer Science",
+    description:
+      "A comprehensive visual journey into graph theory, from foundations to algorithms like Dijkstra's and MST. " +
+      "Features interactive BFS/DFS simulators and real-world application maps in a premium coffee-themed aesthetic.",
+    tags: ["17 Sections", "BFS/DFS Simulators", "Visual Guide"],
+    date: "April 2026",
+    readingTime: "15 min",
+    accent: "#1A6B6A",
+    accentLight: "#E0F5F3",
+    coverPattern: "nodes",
+    visualTags: ["BFS/DFS Simulators", "Algorithm Decision Table", "Interactive Navigation"],
+  },
 ];
 
 export const CATEGORY_META: Record<
