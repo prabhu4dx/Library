@@ -306,11 +306,46 @@ function ExpandableAppBar({
 }
 
 /**
- * Hub Info Section (Hero with Scroll Opacity)
+ * Hub Info Section (Hero with Hardware-Accelerated Parallax)
  */
-function HubInfoSection({ opacity }: { opacity: number }) {
+function HubInfoSection() {
+  const sectionRef = React.useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastScrollY = window.scrollY;
+
+    const updateParallax = () => {
+      const scrollY = window.scrollY;
+      if (scrollY === lastScrollY) {
+        animationFrameId = requestAnimationFrame(updateParallax);
+        return;
+      }
+      lastScrollY = scrollY;
+
+      // Only do deep DOM writes if we are actually near the top of the page
+      if (scrollY < 1200 && sectionRef.current) {
+        // Parallax calculates opacity fade (0 to 600px) and upward slide (35% speed)
+        const opacity = Math.max(0, 1 - scrollY / 600);
+        const parallaxY = scrollY * 0.35;
+        
+        sectionRef.current.style.opacity = opacity.toFixed(3);
+        // Using translate3d forces the browser to dedicate a GPU layer, eliminating main-thread jank
+        sectionRef.current.style.transform = `translate3d(0, -${parallaxY.toFixed(1)}px, 0)`;
+        sectionRef.current.style.pointerEvents = opacity < 0.1 ? "none" : "auto";
+      }
+      animationFrameId = requestAnimationFrame(updateParallax);
+    };
+
+    // We start the loop on mount instead of tying directly to scroll events.
+    // This entirely decouples the math from the browser's scroll event dispatch throttle!
+    animationFrameId = requestAnimationFrame(updateParallax);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
   return (
-    <section style={{
+    <section ref={sectionRef} style={{
       position: "relative",
       minHeight: "85vh",
       display: "flex",
@@ -318,9 +353,8 @@ function HubInfoSection({ opacity }: { opacity: number }) {
       justifyContent: "center",
       padding: "160px clamp(20px, 8vw, 100px) 140px",
       textAlign: "center",
-      opacity: opacity,
-      transition: "opacity 0.2s linear",
-      pointerEvents: opacity < 0.1 ? "none" : "auto",
+      transformOrigin: "center top",
+      willChange: "transform, opacity", // Pre-warns compositor
     }}>
       <div style={{ maxWidth: 1000, position: "relative", zIndex: 10 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 12, fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.25em", color: "#2D241E", opacity: 0.6, marginBottom: 32 }}>
@@ -331,7 +365,12 @@ function HubInfoSection({ opacity }: { opacity: number }) {
           fontFamily: "var(--font-display)", fontSize: "clamp(32px, 7vw, 76px)", 
           fontWeight: 900, lineHeight: 0.95, color: "#2D241E", letterSpacing: "-0.04em", marginBottom: 40 
         }}>
-          Magazine Style <br /> Interactive Mini Books
+          <span style={{
+            background: "linear-gradient(135deg, #D2691E, #CD5C5C)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            display: "inline-block" // prevents weird clipping
+          }}>Magazine Style</span> <br /> Interactive Mini Books
         </h1>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 32, alignItems: "center", maxWidth: 840, margin: "0 auto" }}>
@@ -344,9 +383,29 @@ function HubInfoSection({ opacity }: { opacity: number }) {
 
           <div style={{ paddingTop: 8, width: "100%" }}>
             <span style={{ fontSize: 11, fontWeight: 900, color: "rgba(0,0,0,0.3)", textTransform: "uppercase", letterSpacing: "0.2em", display: "block", marginBottom: 20 }}>The Archive</span>
-            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "24px 40px", textAlign: "center" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 16, textAlign: "center" }}>
               {["Interactive books", "Magazine style books", "Useful tools", "Research reports"].map(t => (
-                <div key={t} style={{ fontSize: 14, fontWeight: 700, color: "#2D241E" }}>~ {t}</div>
+                <div key={t} style={{ 
+                  fontSize: 13, fontWeight: 700, color: "#2D241E",
+                  background: "rgba(255,255,255,0.4)",
+                  backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+                  padding: "10px 24px", borderRadius: 30,
+                  border: "1px solid rgba(255,255,255,0.8)",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.03), inset 0 1px 1px rgba(255,255,255,0.9)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  cursor: "default"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.9)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.03), inset 0 1px 1px rgba(255,255,255,0.9)";
+                }}
+                >
+                  {t}
+                </div>
               ))}
             </div>
           </div>
@@ -366,7 +425,6 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<"time" | "name" | "tags" | "type" | "category">("time");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [scrollY, setScrollY] = useState(0);
 
   const topicsList = useMemo(() => {
     const subs = new Set<string>();
@@ -383,14 +441,6 @@ export default function Home() {
       setTopic("all");
     }
   }, [topicsList, topic]);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const heroOpacity = Math.max(0, 1 - scrollY / 600);
 
   const filteredArticles = useMemo(() => {
     let pool = [...ARTICLES];
@@ -439,8 +489,8 @@ export default function Home() {
 
       <div style={{ position: "relative", zIndex: 2 }}>
         
-        {/* Hub Narrative (Fades on Scroll) */}
-        <HubInfoSection opacity={heroOpacity} />
+        {/* Hub Narrative (Parallax Fades on Scroll) */}
+        <HubInfoSection />
 
         {/* Article Grid Layer */}
         <div style={{ 
