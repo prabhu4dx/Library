@@ -7,89 +7,140 @@ import ArticleCard, { ViewMode } from "./components/ArticleCard";
 /* ── Components ─────────────────────────────────────────── */
 
 /**
- * Luminous Sanctuary Background
- * 24 Symmetrical Pillars (12 per side) tapering steeply inward.
- * Warm palette: Orange, Yellow, Rose, White.
- * Rhythmic 'Pulse' light flashing from bottom up.
+ * Luminous Sanctuary Background (Software Grade CSS Gradients)
+ * Implements a deep, perspective-driven cathedral of light using exclusively CSS GSS gradients.
+ * Drives a real-time 'scroll-to-blur' physics engine using requestAnimationFrame.
  */
 function FixedSanctuaryBackground() {
-  const pillarCount = 12; // Per side
-  const colors = ["#FFEFD5", "#FFFACD", "#FFE4E1", "#FFF5EE"]; // Papaya, Lemon, Rose, White
+  const bgRef = React.useRef<HTMLDivElement>(null);
 
-  const generatePillars = (side: "left" | "right") => {
-    return Array.from({ length: pillarCount }).map((_, i) => {
-      const ratio = i / (pillarCount - 1); // 0 (outer) to 1 (inner)
-      const invRatio = 1 - ratio;
-      
-      return {
-        side,
-        // Non-linear spacing for deeper perspective
-        position: `${(Math.pow(i, 1.4) * 1.8)}%`,
-        // Steep height/width tapering: Outer is tall/wide, Inner is short/narrow
-        width: `${14 * Math.pow(invRatio, 1.5) + 1.2}vw`,
-        height: `${65 * Math.pow(invRatio, 1.8) + 35}vh`,
-        opacity: 0.35 * invRatio + 0.05,
-        color: colors[i % colors.length],
-        blur: `${10 * ratio + 40}px`,
-        zIndex: pillarCount - i,
-        delay: `${i * 0.5}s`, // Staggered flashing
-      };
-    });
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastScrollY = -1; // Force first frame trigger
+
+    const updateBlur = () => {
+      const scrollY = window.scrollY;
+      if (scrollY === lastScrollY) {
+        animationFrameId = requestAnimationFrame(updateBlur);
+        return;
+      }
+      lastScrollY = scrollY;
+
+      // Blur increases up to 32px over the first 800px of scrolling
+      if (bgRef.current) {
+        const blurValue = Math.min(32, (scrollY / 800) * 32);
+        // Slowly reduce opacity/brightness to draw absolute focus to reading material
+        const opacity = Math.max(0.3, 1 - (scrollY / 1000) * 0.7);
+        // Slightly zoom inward for depth
+        const scale = 1 + (scrollY / 1000) * 0.05;
+
+        bgRef.current.style.filter = `blur(${blurValue.toFixed(1)}px)`;
+        bgRef.current.style.opacity = opacity.toFixed(2);
+        bgRef.current.style.transform = `scale(${scale.toFixed(3)})`;
+      }
+      animationFrameId = requestAnimationFrame(updateBlur);
+    };
+
+    animationFrameId = requestAnimationFrame(updateBlur);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  const pillars = [
+    // LEFT SIDE (Foreground to Background Perspective Depth)
+    { side: "left", pos: "-5%", width: "18%", height: "115%", z: 20, blur: "0px", bottom: "-10%" }, // Immersive Front
+    { side: "left", pos: "9%", width: "12%", height: "95%", z: 19, blur: "0px", bottom: "0%" },     // Planted on screen bottom
+    { side: "left", pos: "18%", width: "8.5%", height: "78%", z: 18, blur: "0.5px", bottom: "8%" }, // Receding
+    { side: "left", pos: "24.5%", width: "6%", height: "64%", z: 17, blur: "1px", bottom: "15%" },
+    { side: "left", pos: "29%", width: "4%", height: "52%", z: 16, blur: "1.5px", bottom: "21%" },
+    { side: "left", pos: "32%", width: "2.5%", height: "44%", z: 15, blur: "2px", bottom: "26%" },
+    { side: "left", pos: "34%", width: "1.5%", height: "38%", z: 14, blur: "3px", bottom: "30%" },
+    
+    // RIGHT SIDE (Mirroring geometry)
+    { side: "right", pos: "-5%", width: "18%", height: "115%", z: 20, blur: "0px", bottom: "-10%" },
+    { side: "right", pos: "9%", width: "12%", height: "95%", z: 19, blur: "0px", bottom: "0%" },
+    { side: "right", pos: "18%", width: "8.5%", height: "78%", z: 18, blur: "0.5px", bottom: "8%" },
+    { side: "right", pos: "24.5%", width: "6%", height: "64%", z: 17, blur: "1px", bottom: "15%" },
+    { side: "right", pos: "29%", width: "4%", height: "52%", z: 16, blur: "1.5px", bottom: "21%" },
+    { side: "right", pos: "32%", width: "2.5%", height: "44%", z: 15, blur: "2px", bottom: "26%" },
+    { side: "right", pos: "34%", width: "1.5%", height: "38%", z: 14, blur: "3px", bottom: "30%" },
+  ];
+
+  const getPillarGradient = (side: string) => {
+    // Generates a 3D cylindrical shader wrap. 
+    // Light is blasting from the center aisle onto the inner-facing curves of the columns.
+    if (side === "left") {
+      return "linear-gradient(to right, #DBCAC0 0%, #ECE0D8 30%, #F8F0EC 70%, #FFFFFF 100%)";
+    } else {
+      return "linear-gradient(to left, #DBCAC0 0%, #ECE0D8 30%, #F8F0EC 70%, #FFFFFF 100%)";
+    }
   };
 
-  const leftPillars = useMemo(() => generatePillars("left"), []);
-  const rightPillars = useMemo(() => generatePillars("right"), []);
-
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: -1, background: "#FFFFFF", overflow: "hidden" }}>
-      {/* Ambient Mesh Glow (Warm Sunset) */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: `
-          radial-gradient(circle at 5% 10%, #FFEFD590 0%, transparent 40%),
-          radial-gradient(circle at 95% 15%, #FFE4E170 0%, transparent 45%),
-          radial-gradient(circle at 50% 90%, #FFFACD40 0%, transparent 60%),
-          #FFFFFF
-        `,
-        filter: "blur(120px)"
-      }} />
-
-      {/* Luminous Architecture Array */}
-      {[...leftPillars, ...rightPillars].map((p, idx) => (
-        <div key={idx} className="pillar-luminous" style={{
-          position: "absolute",
-          [p.side]: p.position,
-          bottom: 0,
-          width: p.width,
-          height: p.height,
-          background: `linear-gradient(to top, ${p.color}EE 0%, ${p.color}40 40%, transparent 95%)`,
-          backdropFilter: `blur(${p.blur})`,
-          WebkitBackdropFilter: `blur(${p.blur})`,
-          borderRadius: "500px 500px 0 0",
-          opacity: p.opacity,
-          zIndex: p.zIndex,
-          animationDelay: p.delay,
+    <div style={{ position: "fixed", inset: 0, zIndex: -1, background: "#FDFCF7", overflow: "hidden" }}>
+      
+      {/* The Dynamic Scroll-to-Blur Engine */}
+      <div ref={bgRef} style={{ 
+        position: "absolute", inset: 0, 
+        willChange: "filter, opacity, transform", 
+        // We scale from the bottom so the floor horizon never moves during the parallax zoom
+        transformOrigin: "center 85%" 
+      }}>
+        
+        {/* Foundation Atmospheric Sky (Warm Beige to White) */}
+        <div style={{ 
+          position: "absolute", inset: 0, 
+          background: "linear-gradient(to bottom, #F0E6DD 0%, #F8F0EC 30%, #FFFFFF 70%)" 
         }} />
-      ))}
 
-      {/* Vignette Shadow for Depth */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "radial-gradient(circle at center, transparent 45%, rgba(255,255,255,0.4) 100%)",
-        pointerEvents: "none"
-      }} />
+        {/* 3D Volumetric Cylinders Array */}
+        {pillars.map((p, i) => (
+          <div key={i} style={{
+            position: "absolute",
+            bottom: p.bottom, // Dynamic physics bottom planting the pillar squarely onto the perspective floor
+            [p.side]: p.pos,
+            width: p.width,
+            height: p.height,
+            background: getPillarGradient(p.side),
+            borderRadius: "1000px 1000px 0 0", // Absolute rounded cylinder tops
+            filter: `blur(${p.blur})`, // Gently soften distant edges
+            zIndex: p.z,
+            // Only gracefully soften the very last 5% of the base so it merges physically into the floor reflection, but stands solid
+            maskImage: "linear-gradient(to bottom, black 0%, black 95%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 95%, transparent 100%)",
+          }}>
+            {/* Extremely bright localized rim light glowing around the inner edge curve */}
+            <div style={{
+              position: "absolute", top: 0, bottom: 0,
+              [p.side === "left" ? "right" : "left"]: "-4%", 
+              width: "25%",
+              background: `linear-gradient(to ${p.side === "left" ? "right" : "left"}, transparent 0%, rgba(255,255,255,1) 100%)`,
+              filter: "blur(6px)",
+            }} />
+          </div>
+        ))}
 
-      <style jsx global>{`
-        .pillar-luminous {
-          animation: pillar-flash 8s infinite alternate ease-in-out;
-          will-change: opacity, transform;
-        }
-        @keyframes pillar-flash {
-          0% { transform: scaleY(0.98); opacity: 0.1; filter: brightness(0.9) saturate(0.8); }
-          50% { opacity: 0.4; filter: brightness(1.3) saturate(1.2); }
-          100% { transform: scaleY(1.02); opacity: 0.1; filter: brightness(0.9) saturate(0.8); }
-        }
-      `}</style>
+        {/* The Mirrored High-Gloss Reflection Perspective Floor */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: "35%",
+          // Draws from deep warm floor shadows bleeding upwards into pure transparency behind the pillars
+          background: "linear-gradient(to top, #EDDCD1 0%, rgba(250, 239, 236, 0.4) 40%, transparent 100%)",
+          zIndex: 1, // Sweeps underneath the pillars, rooting them into the ground
+        }} />
+
+        {/* Deep Horizon Glow / Holy Light Core pushing out from the vanished aisle */}
+        <div style={{
+          position: "absolute", top: "25%", bottom: "20%", left: "30%", right: "30%",
+          background: "radial-gradient(ellipse at 50% 100%, #FFFFFF 0%, rgba(255,255,255,0.9) 30%, transparent 70%)",
+          filter: "blur(30px)", zIndex: 5,
+        }} />
+
+        {/* Optical Alignment Vignette pushing depth */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "radial-gradient(circle at center, transparent 35%, rgba(210, 195, 185, 0.2) 80%, rgba(180, 160, 145, 0.3) 100%)",
+          pointerEvents: "none", zIndex: 40
+        }} />
+      </div>
     </div>
   );
 }
@@ -466,7 +517,7 @@ export default function Home() {
   }, [category, type, search, sortKey, sortDir]);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF" }}>
+    <div style={{ minHeight: "100vh", background: "transparent" }}>
       
       {/* Luminous Perspective Pillars Backdrop */}
       <FixedSanctuaryBackground />
