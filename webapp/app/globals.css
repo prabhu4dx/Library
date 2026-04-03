@@ -3,7 +3,7 @@
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
   /* Typography */
-  --font-display: var(--font-playfair), "Georgia", serif;
+  --font-display: var(--font-display), "Georgia", serif;
   --font-body: var(--font-inter), -apple-system, "Helvetica Neue", sans-serif;
 
   /* Palette — clean white */

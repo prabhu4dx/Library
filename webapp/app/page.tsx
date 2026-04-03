@@ -413,15 +413,21 @@ function HubInfoSection() {
         </div>
         
         <h1 style={{ 
-          fontFamily: "var(--font-display)", fontSize: "clamp(32px, 7vw, 76px)", 
-          fontWeight: 900, lineHeight: 0.95, color: "#2D241E", letterSpacing: "-0.04em", marginBottom: 40 
+          fontFamily: "var(--font-display)", fontSize: "clamp(48px, 8vw, 92px)", 
+          fontWeight: 900, lineHeight: 0.9, color: "#2D241E", letterSpacing: "-0.04em", marginBottom: 40,
+          fontVariationSettings: '"SOFT" 100, "WONK" 1'
         }}>
           <span style={{
             background: "linear-gradient(135deg, #D2691E, #CD5C5C)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            display: "inline-block" // prevents weird clipping
-          }}>Magazine Style</span> <br /> Interactive Mini Books
+            display: "inline-block", 
+            fontStyle: "italic",
+            paddingRight: "0.1em",
+            paddingBottom: "0.2em", // Expands clipping box to recover the 'g' and 'y' tails
+            marginBottom: "-0.2em" // Prevents the padding from pushing the second line downward
+          }}>Magazine Style</span> <br /> 
+          <span style={{ fontSize: "clamp(32px, 6vw, 68px)", fontWeight: 800 }}>Interactive Mini Books</span>
         </h1>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 32, alignItems: "center", maxWidth: 840, margin: "0 auto" }}>

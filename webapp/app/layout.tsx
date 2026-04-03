@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import HomeButton from "@/app/components/HomeButton";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const displayFont = Fraunces({
+  variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  axes: ["SOFT", "WONK"],
 });
 
 const inter = Inter({
@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${inter.variable}`}
+      className={`${displayFont.variable} ${inter.variable}`}
     >
       <body>
         <HomeButton />
