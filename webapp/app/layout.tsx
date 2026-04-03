@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
-import HomeButton from "@/app/components/HomeButton";
+import HomeButton from "@/components/HomeButton";
 
 const displayFont = Fraunces({
   variable: "--font-display",

@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { ARTICLES, CATEGORY_META } from "../lib/registry";
-import ArticleCard, { ViewMode } from "../components/ArticleCard";
+import { ARTICLES, CATEGORY_META } from "@/lib/registry";
+import ArticleCard, { ViewMode } from "@/components/ArticleCard";
 
 export default function UiuxPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("pillar");

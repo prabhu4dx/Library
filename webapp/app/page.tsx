@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ARTICLES, Category, ArticleType, CATEGORY_META, TYPE_META } from "./lib/registry";
-import ArticleCard, { ViewMode } from "./components/ArticleCard";
+import { ARTICLES, Category, ArticleType, CATEGORY_META, TYPE_META } from "@/lib/registry";
+import ArticleCard, { ViewMode } from "@/components/ArticleCard";
 
 /* ── Components ─────────────────────────────────────────── */
 
