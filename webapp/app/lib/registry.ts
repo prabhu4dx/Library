@@ -1,4 +1,5 @@
-export type Category = "ai" | "uiux";
+export type Category = "ai" | "uiux" | "cs";
+export type ArticleType = "book" | "tool" | "lab" | "report" | "survey";
 export type CoverPattern = "circles" | "terminal" | "nodes" | "dims" | "flow";
 
 export type Article = {
@@ -8,6 +9,7 @@ export type Article = {
   path: string;
   category: Category;
   subcategory: string;
+  type: ArticleType;
   description: string;
   tags: string[];
   date: string;
@@ -27,6 +29,7 @@ export const ARTICLES: Article[] = [
     path: "/ai/agi/why-llm-cannot-reach-agi-technical-research-survey",
     category: "ai",
     subcategory: "AGI",
+    type: "survey",
     description:
       "A deep technical survey spanning five research fronts: reasoning failures, memory limitations, ARC-AGI benchmarks, neuroscience comparisons, and proposed solutions. Evidence converges — LLMs are sophisticated interpolation engines fundamentally bounded by next-token prediction.",
     tags: ["80+ Papers", "Dark Mode", "Research Survey"],
@@ -45,6 +48,7 @@ export const ARTICLES: Article[] = [
     path: "/ai/coding-agents/march-2026-landscape-report",
     category: "ai",
     subcategory: "Coding Agents",
+    type: "report",
     description:
       "13 agents benchmarked: Claude Code, Cursor, Windsurf, Gemini, GitHub Copilot, Devin, and more. Covers SWE-bench scores, architecture internals, market valuations, and the 5 defining trends for 2026–2027.",
     tags: ["13 Agents", "Benchmarks", "Market Data"],
@@ -62,6 +66,7 @@ export const ARTICLES: Article[] = [
     path: "/uiux/design-system/top-brands-design-principles",
     category: "uiux",
     subcategory: "Design Systems",
+    type: "tool",
     description:
       "19 design systems — Apple, Google, Stripe, Linear, IBM, Figma, and more — mapped across 8 dimensions. A physics-based force graph, radar comparisons, bubble matrix, divergence rankings, and a 48-year timeline.",
     tags: ["19 Brands", "Force Graph", "Radar Chart"],
@@ -79,6 +84,7 @@ export const ARTICLES: Article[] = [
     path: "/uiux/design-system/3-tier-token-architecture/N-Matrix-Exploration",
     category: "uiux",
     subcategory: "Design Systems",
+    type: "lab",
     description:
       "Every design token lives at a point in N-dimensional space. Slide dimensions live — color, radius, shadow, typography, spacing, motion, state — and watch 25 tokens cascade in real-time across a live component preview.",
     tags: ["7 Dimensions", "Live Preview", "Real-time CSS"],
@@ -96,6 +102,7 @@ export const ARTICLES: Article[] = [
     path: "/uiux/design-system/3-tier-token-architecture/mime-app",
     category: "uiux",
     subcategory: "Design Systems",
+    type: "tool",
     description:
       "Five interactive tools: Token Flow mind map tracing primitive→semantic→component chains, N-Dim Matrix, Decision Simulator with live WCAG audit, Token Debt Lab with before/after code diffs, and a scored Naming Game.",
     tags: ["5 Tools", "Quiz & Scoring", "WCAG Audit"],
@@ -113,6 +120,7 @@ export const ARTICLES: Article[] = [
     path: "/uiux/typography/tools/anatomy-explorer",
     category: "uiux",
     subcategory: "Typography",
+    type: "tool",
     description:
       "A live canvas lab for exploring the geometric anatomy of 25 Google Fonts. " +
       "Drag the five reference lines — ascender, cap height, x-height, baseline, descender — to reshape proportions, " +
@@ -132,6 +140,7 @@ export const ARTICLES: Article[] = [
     path: "/uiux/typography/mini-typography-book",
     category: "uiux",
     subcategory: "Typography",
+    type: "book",
     description:
       "A complete beginner's guide to typography across 15 interactive chapters — from type anatomy and classification to variable fonts, screen rendering, and web best practices. " +
       "Features a spacing lab, modular scale generator, anatomy hover explorer, 20-event history timeline, and a 29-term flip-card glossary.",
@@ -150,6 +159,7 @@ export const ARTICLES: Article[] = [
     path: "/uiux/color/encyclopedia",
     category: "uiux",
     subcategory: "Color Science",
+    type: "book",
     description:
       "A comprehensive interactive reference for 20 color systems — from sRGB and OKLCH to CMYK, ACES, and CAM16/HCT. Eight views: magazine grid, chronological timeline, domain map, hardware layers, use cases, compare table, color lab, and concepts guide.",
     tags: ["20 Systems", "Color Science", "CSS Level 4"],
@@ -165,8 +175,9 @@ export const ARTICLES: Article[] = [
     title: "The DSA Codex",
     subtitle: "Interactive Algorithm Reference · 8 Data Structures",
     path: "/computer-science/dsa/rose-book",
-    category: "ai",
-    subcategory: "Computer Science",
+    category: "cs",
+    subcategory: "Data Structures",
+    type: "book",
     description:
       "A digital simulation book exploring 8 fundamental data structures — from arrays and hash tables to heaps and graphs. " +
       "Features interactive simulators, a 2300-year algorithmic timeline, and visual deep-dives into complexity and patterns.",
@@ -183,8 +194,9 @@ export const ARTICLES: Article[] = [
     title: "Graph Theory — The Complete Visual Book",
     subtitle: "Interactive Algorithm Reference · 17 Sections",
     path: "/computer-science/dsa/graph-coffee-icecream-fundamentals",
-    category: "ai",
-    subcategory: "Computer Science",
+    category: "cs",
+    subcategory: "Algorithms",
+    type: "book",
     description:
       "A comprehensive visual journey into graph theory, from foundations to algorithms like Dijkstra's and MST. " +
       "Features interactive BFS/DFS simulators and real-world application maps in a premium coffee-themed aesthetic.",
@@ -212,4 +224,20 @@ export const CATEGORY_META: Record<
     description:
       "Visual explorations of design systems, token architecture, and the principles behind great digital products.",
   },
+  cs: {
+    label: "Computer Science",
+    description:
+      "Technical deep-dives into algorithms, data structures, and the mathematical foundations of computing.",
+  },
+};
+
+export const TYPE_META: Record<
+  ArticleType,
+  { label: string; icon: string }
+> = {
+  book: { label: "Interactive Book", icon: "" },
+  tool: { label: "Interactive Tool", icon: "" },
+  lab: { label: "Experimental Lab", icon: "" },
+  report: { label: "Industry Report", icon: "" },
+  survey: { label: "Research Survey", icon: "" },
 };

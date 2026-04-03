@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Article } from "../lib/registry";
+import { Article, TYPE_META } from "../lib/registry";
 
 export type ViewMode = "pillar" | "horizontal";
 
@@ -77,7 +77,6 @@ export default function ArticleCard({ article, viewMode }: {
           padding: "0 48px",
         }}>
         
-        {/* Animated Wavy Mesh Gradient */}
         <div style={{
           position: "absolute",
           inset: -150,
@@ -94,7 +93,6 @@ export default function ArticleCard({ article, viewMode }: {
           animation: "wave-mesh 25s infinite alternate ease-in-out",
         }} />
 
-        {/* Organic Metallic Glass Surface Texture (Noise) */}
         <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: hovered ? 0.35 : 0.2, transition: "opacity 0.8s ease", pointerEvents: "none", zIndex: 1, mixBlendMode: "overlay" }}>
           <filter id={`h-surface-noise-${article.id}`}>
             <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="4" stitchTiles="stitch" />
@@ -103,7 +101,6 @@ export default function ArticleCard({ article, viewMode }: {
           <rect width="100%" height="100%" filter={`url(#h-surface-noise-${article.id})`} />
         </svg>
 
-        {/* Glossy Sheen Overlay */}
         <div style={{
           position: "absolute",
           inset: 0,
@@ -116,24 +113,34 @@ export default function ArticleCard({ article, viewMode }: {
           pointerEvents: "none",
         }} />
 
-        {/* Content Container */}
         <div style={{ position: "relative", zIndex: 3 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <div style={{
-              fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
-              textTransform: "uppercase", padding: "6px 14px", borderRadius: 10,
-              background: "rgba(255,255,255,0.9)", color: article.accent,
-              fontFamily: "var(--font-body)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-            }}>
-              {article.subcategory}
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <div style={{
+                fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
+                textTransform: "uppercase", padding: "6px 14px", borderRadius: 10,
+                background: "rgba(255,255,255,0.9)", color: article.accent,
+                fontFamily: "var(--font-body)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+              }}>
+                {article.subcategory}
+              </div>
+              <div style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: "0.05em",
+                padding: "6px 12px", borderRadius: 10,
+                background: "rgba(255,255,255,0.3)", color: "var(--text-1)",
+                fontFamily: "var(--font-body)",
+                display: "flex", alignItems: "center",
+              }}>
+                {TYPE_META[article.type].label}
+              </div>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              {article.visualTags.slice(0, 2).map((t) => (
+              {article.visualTags.slice(0, 1).map((t) => (
                 <div key={t} style={{
                   fontSize: 9, fontWeight: 700, letterSpacing: "0.05em",
                   padding: "4px 12px", borderRadius: 8,
-                  background: "rgba(255,255,255,0.3)", color: "var(--text-1)",
+                  background: "rgba(255,255,255,0.15)", color: "var(--text-2)",
                   fontFamily: "var(--font-body)",
                 }}>{t}</div>
               ))}
@@ -239,23 +246,34 @@ export default function ArticleCard({ article, viewMode }: {
         
         {/* Editorial Badges */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "auto" }}>
-          <div style={{
-            fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
-            textTransform: "uppercase", padding: "6px 14px", borderRadius: 10,
-            background: "rgba(255,255,255,0.9)", color: article.accent,
-            fontFamily: "var(--font-body)",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-          }}>
-            {article.subcategory}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+            <div style={{
+              fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
+              textTransform: "uppercase", padding: "6px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.9)", color: article.accent,
+              fontFamily: "var(--font-body)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+            }}>
+              {article.subcategory}
+            </div>
+            <div style={{
+              fontSize: 9, fontWeight: 700, letterSpacing: "0.05em",
+              padding: "6px 12px", borderRadius: 10,
+              background: "rgba(255,255,255,0.3)", color: "var(--text-1)",
+              fontFamily: "var(--font-body)",
+              display: "flex", alignItems: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+            }}>
+              {TYPE_META[article.type].label}
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "60%" }}>
-            {article.visualTags.slice(0, 2).map((t) => (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "40%" }}>
+            {article.visualTags.slice(0, 1).map((t) => (
               <div key={t} style={{
                 fontSize: 9, fontWeight: 700, letterSpacing: "0.05em",
                 padding: "4px 12px", borderRadius: 8,
-                background: "rgba(255,255,255,0.3)", color: "var(--text-1)",
+                background: "rgba(255,255,255,0.15)", color: "var(--text-2)",
                 fontFamily: "var(--font-body)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
               }}>{t}</div>
             ))}
           </div>
