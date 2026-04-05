@@ -208,6 +208,24 @@ export const ARTICLES: Article[] = [
     coverPattern: "nodes",
     visualTags: ["BFS/DFS Simulators", "Algorithm Decision Table", "Interactive Navigation"],
   },
+  {
+    id: "beyond-llm-architecture",
+    title: "Post-LLM Architecture Explorer",
+    subtitle: "Technical Research Reference · 17 Paradigms",
+    path: "/ai/agi/beyond-llm-architecture",
+    category: "ai",
+    subcategory: "AGI",
+    type: "survey",
+    description:
+      "A deep exploration of 17 AI paradigms beyond token prediction—from state space models and world models to neuro-symbolic AI and neuromorphic chips. Compare architectures via interactive radar charts and technical deep-dives.",
+    tags: ["17 Paradigms", "Post-LLM Research", "Interactive Radar"],
+    date: "April 2026",
+    readingTime: "15 min",
+    accent: "#7B2D26",
+    accentLight: "#FDF2F2",
+    coverPattern: "nodes",
+    visualTags: ["Capability Radar", "Comparison Table", "17 Deep-Dives"],
+  },
 ];
 
 export const CATEGORY_META: Record<
