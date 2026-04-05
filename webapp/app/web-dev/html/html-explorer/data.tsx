@@ -173,7 +173,7 @@ export const CATEGORIES = [
 ];
 
 // ─── TAGS ─────────────────────────────────────────────────────────────────────
-export const TAGS = [
+export const TAGS: any[] = [
     // DOCUMENT
     {
         t: "html", cat: "document", desc: "Root element of every webpage", void: false, replaced: false,
@@ -764,8 +764,144 @@ export const TAGS = [
 export const ATTR_TO_TAGS = {};
 // Global attrs apply to all tags
 const globalAttrNames = Object.keys(ATTR_DEFS).filter(k => ATTR_DEFS[k].f === "global");
+
+// ─── EXTENDED METADATA (DOM, Era, Events, A11y) ──────────────────────────────
+const TAG_EXTENSIONS = {
+    // Document
+    html: { dom: "HTMLHtmlElement", era: "HTML4", a11y: { implicit: "document" } },
+    head: { dom: "HTMLHeadElement", era: "HTML4" },
+    body: { dom: "HTMLBodyElement", era: "HTML4", a11y: { implicit: "document" } },
+    title: { dom: "HTMLTitleElement", era: "HTML4" },
+    base: { dom: "HTMLBaseElement", era: "HTML4" },
+    // Metadata
+    meta: { dom: "HTMLMetaElement", era: "HTML4" },
+    link: { dom: "HTMLLinkElement", era: "HTML4", events: ["load", "error"] },
+    style: { dom: "HTMLStyleElement", era: "HTML4", events: ["load", "error"] },
+    script: { dom: "HTMLScriptElement", era: "HTML4", events: ["load", "error"] },
+    noscript: { dom: "HTMLElement", era: "HTML4" },
+    // Sectioning
+    header: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "banner" } },
+    nav: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "navigation" } },
+    main: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "main" } },
+    article: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "article" } },
+    section: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "region" } },
+    aside: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "complementary" } },
+    footer: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "contentinfo" } },
+    address: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "group" } },
+    // Headings
+    h1: { dom: "HTMLHeadingElement", era: "HTML4", a11y: { implicit: "heading" } },
+    h2: { dom: "HTMLHeadingElement", era: "HTML4", a11y: { implicit: "heading" } },
+    h3: { dom: "HTMLHeadingElement", era: "HTML4", a11y: { implicit: "heading" } },
+    h4: { dom: "HTMLHeadingElement", era: "HTML4", a11y: { implicit: "heading" } },
+    h5: { dom: "HTMLHeadingElement", era: "HTML4", a11y: { implicit: "heading" } },
+    h6: { dom: "HTMLHeadingElement", era: "HTML4", a11y: { implicit: "heading" } },
+    hgroup: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "group" } },
+    // Block
+    div: { dom: "HTMLDivElement", era: "HTML4", a11y: { implicit: "generic" } },
+    p: { dom: "HTMLParagraphElement", era: "HTML4", a11y: { implicit: "paragraph" } },
+    pre: { dom: "HTMLPreElement", era: "HTML4" },
+    blockquote: { dom: "HTMLQuoteElement", era: "HTML4", a11y: { implicit: "blockquote" } },
+    figure: { dom: "HTMLElement", era: "HTML5", a11y: { implicit: "figure" } },
+    figcaption: { dom: "HTMLElement", era: "HTML5" },
+    hr: { dom: "HTMLHRElement", era: "HTML4", a11y: { implicit: "separator" } },
+    // Inline
+    span: { dom: "HTMLSpanElement", era: "HTML4", a11y: { implicit: "generic" } },
+    a: { dom: "HTMLAnchorElement", era: "HTML4", events: ["click"], a11y: { implicit: "link", requires: ["href"] } },
+    em: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "emphasis" } },
+    strong: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "strong" } },
+    code: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "code" } },
+    mark: { dom: "HTMLElement", era: "HTML5" },
+    time: { dom: "HTMLTimeElement", era: "HTML5", a11y: { implicit: "time" } },
+    abbr: { dom: "HTMLElement", era: "HTML4", a11y: { requires: ["title"] } },
+    q: { dom: "HTMLQuoteElement", era: "HTML4" },
+    cite: { dom: "HTMLElement", era: "HTML4" },
+    dfn: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "term" } },
+    del: { dom: "HTMLModElement", era: "HTML4", a11y: { implicit: "deletion" } },
+    ins: { dom: "HTMLModElement", era: "HTML4", a11y: { implicit: "insertion" } },
+    small: { dom: "HTMLElement", era: "HTML4" },
+    sub: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "subscript" } },
+    sup: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "superscript" } },
+    b: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "generic" } },
+    i: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "generic" } },
+    s: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "deletion" } },
+    u: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "generic" } },
+    kbd: { dom: "HTMLElement", era: "HTML4" },
+    samp: { dom: "HTMLElement", era: "HTML4" },
+    var: { dom: "HTMLElement", era: "HTML4" },
+    data: { dom: "HTMLDataElement", era: "HTML5", a11y: { requires: ["value"] } },
+    bdi: { dom: "HTMLElement", era: "HTML5" },
+    bdo: { dom: "HTMLElement", era: "HTML4", a11y: { requires: ["dir"] } },
+    ruby: { dom: "HTMLElement", era: "HTML5" },
+    rt: { dom: "HTMLElement", era: "HTML5" },
+    rp: { dom: "HTMLElement", era: "HTML5" },
+    br: { dom: "HTMLBRElement", era: "HTML4" },
+    wbr: { dom: "HTMLElement", era: "HTML5" },
+    // Lists
+    ul: { dom: "HTMLUListElement", era: "HTML4", a11y: { implicit: "list" } },
+    ol: { dom: "HTMLOListElement", era: "HTML4", a11y: { implicit: "list" } },
+    li: { dom: "HTMLLIElement", era: "HTML4", a11y: { implicit: "listitem" } },
+    dl: { dom: "HTMLDListElement", era: "HTML4" },
+    dt: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "term" } },
+    dd: { dom: "HTMLElement", era: "HTML4", a11y: { implicit: "definition" } },
+    // Embedded
+    img: { dom: "HTMLImageElement", era: "HTML4", events: ["load", "error"], a11y: { implicit: "img", requires: ["alt", "src"] } },
+    picture: { dom: "HTMLPictureElement", era: "HTML5" },
+    source: { dom: "HTMLSourceElement", era: "HTML5", a11y: { requires: ["src", "srcset"] } },
+    video: { dom: "HTMLVideoElement", era: "HTML5", events: ["play", "pause", "ended", "timeupdate", "volumechange"], a11y: { implicit: "application" } },
+    audio: { dom: "HTMLAudioElement", era: "HTML5", events: ["play", "pause", "ended", "timeupdate", "volumechange"], a11y: { implicit: "application" } },
+    track: { dom: "HTMLTrackElement", era: "HTML5" },
+    iframe: { dom: "HTMLIFrameElement", era: "HTML4", events: ["load"], a11y: { implicit: "iframe", requires: ["title"] } },
+    canvas: { dom: "HTMLCanvasElement", era: "HTML5", a11y: { requires: ["aria-label"] } },
+    svg: { dom: "SVGSVGElement", era: "HTML5", a11y: { implicit: "graphics-document" } },
+    embed: { dom: "HTMLEmbedElement", era: "HTML4", a11y: { requires: ["title"] } },
+    object: { dom: "HTMLObjectElement", era: "HTML4", a11y: { requires: ["title"] } },
+    map: { dom: "HTMLMapElement", era: "HTML4" },
+    area: { dom: "HTMLAreaElement", era: "HTML4", events: ["click"], a11y: { requires: ["alt"] } },
+    // Tables
+    table: { dom: "HTMLTableElement", era: "HTML4", a11y: { implicit: "table" } },
+    caption: { dom: "HTMLTableCaptionElement", era: "HTML4" },
+    colgroup: { dom: "HTMLTableColElement", era: "HTML4" },
+    col: { dom: "HTMLTableColElement", era: "HTML4" },
+    thead: { dom: "HTMLTableSectionElement", era: "HTML4", a11y: { implicit: "rowgroup" } },
+    tbody: { dom: "HTMLTableSectionElement", era: "HTML4", a11y: { implicit: "rowgroup" } },
+    tfoot: { dom: "HTMLTableSectionElement", era: "HTML4", a11y: { implicit: "rowgroup" } },
+    tr: { dom: "HTMLTableRowElement", era: "HTML4", a11y: { implicit: "row" } },
+    th: { dom: "HTMLTableCellElement", era: "HTML4", a11y: { implicit: "columnheader" } },
+    td: { dom: "HTMLTableDataCellElement", era: "HTML4", a11y: { implicit: "cell" } },
+    // Forms
+    form: { dom: "HTMLFormElement", era: "HTML4", events: ["submit", "reset"], a11y: { implicit: "form" } },
+    input: { dom: "HTMLInputElement", era: "HTML4", events: ["input", "change", "focus", "blur", "invalid"], a11y: { implicit: "textbox/checkbox/radio" } },
+    label: { dom: "HTMLLabelElement", era: "HTML4", events: ["click"] },
+    button: { dom: "HTMLButtonElement", era: "HTML4", events: ["click"], a11y: { implicit: "button" } },
+    textarea: { dom: "HTMLTextAreaElement", era: "HTML4", events: ["input", "change", "focus", "blur"], a11y: { implicit: "textbox" } },
+    select: { dom: "HTMLSelectElement", era: "HTML4", events: ["change", "input"], a11y: { implicit: "combobox/listbox" } },
+    option: { dom: "HTMLOptionElement", era: "HTML4", a11y: { implicit: "option" } },
+    optgroup: { dom: "HTMLOptGroupElement", era: "HTML4", a11y: { implicit: "group" } },
+    fieldset: { dom: "HTMLFieldSetElement", era: "HTML4", a11y: { implicit: "group" } },
+    legend: { dom: "HTMLLegendElement", era: "HTML4" },
+    datalist: { dom: "HTMLDataListElement", era: "HTML5", a11y: { implicit: "listbox" } },
+    output: { dom: "HTMLOutputElement", era: "HTML5", a11y: { implicit: "status" } },
+    progress: { dom: "HTMLProgressElement", era: "HTML5", a11y: { implicit: "progressbar" } },
+    meter: { dom: "HTMLMeterElement", era: "HTML5", a11y: { implicit: "meter" } },
+    // Interactive
+    details: { dom: "HTMLDetailsElement", era: "HTML5", events: ["toggle"], a11y: { implicit: "group" } },
+    summary: { dom: "HTMLElement", era: "HTML5", events: ["click"], a11y: { implicit: "button" } },
+    dialog: { dom: "HTMLDialogElement", era: "HTML5", events: ["close", "cancel"], a11y: { implicit: "dialog" } },
+    menu: { dom: "HTMLMenuElement", era: "HTML4", a11y: { implicit: "list" } },
+    // Template
+    template: { dom: "HTMLTemplateElement", era: "Web Components" },
+    slot: { dom: "HTMLSlotElement", era: "Web Components", events: ["slotchange"] },
+};
+
 TAGS.forEach(tag => {
-    // specific
+    // Apply extensions
+    const ext = TAG_EXTENSIONS[tag.t] || {};
+    tag.dom = ext.dom || "HTMLElement";
+    tag.era = ext.era || "HTML4";
+    tag.events = ext.events || [];
+    tag.a11y = ext.a11y || {};
+    
+    // Reverse indices mappings
     tag.specific.forEach(a => {
         if (!ATTR_TO_TAGS[a]) ATTR_TO_TAGS[a] = [];
         ATTR_TO_TAGS[a].push(tag.t);

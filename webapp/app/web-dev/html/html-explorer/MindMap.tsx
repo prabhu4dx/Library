@@ -106,10 +106,44 @@ function TagDetail({ tag, onClose }) {
 
             {/* Content */}
             <div style={{ flex: 1, overflowY: "auto", padding: "0 0 40px" }}>
+                {/* Technical Architecture Section */}
+                <SectionTitle title="Technical Architecture" count="" />
+                <div style={{ padding: "8px 32px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div style={{ display: "flex", gap: 20 }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>DOM Interface</div>
+                            <code style={{ fontSize: 12, color: ZINC[900], background: ZINC[100], padding: "4px 8px", borderRadius: 4, display: "inline-block" }}>{tag.dom}</code>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Browser Era</div>
+                            <div style={{ fontSize: 12, color: ZINC[700], fontWeight: 600 }}>{tag.era}</div>
+                        </div>
+                    </div>
+                    
+                    {tag.a11y?.implicit && (
+                        <div>
+                            <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Implicit ARIA</div>
+                            <div style={{ fontSize: 12, color: "#4f46e5", fontWeight: 700 }}>role="{tag.a11y.implicit}"</div>
+                        </div>
+                    )}
+
+                    {tag.events?.length > 0 && (
+                        <div>
+                            <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, marginBottom: 8, textTransform: "uppercase" }}>JavaScript Events</div>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                {tag.events.map(ev => (
+                                    <code key={ev} style={{ fontSize: 11, background: ZINC[50], border: `1px solid ${ZINC[200]}`, color: ZINC[600], padding: "2px 8px", borderRadius: 4 }}>{ev}</code>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 <SectionTitle title="Specific Attributes" count={tag.specific.length} />
                 {tag.specific.map((a) => (
                     <AttrItem key={a} name={a} def={ATTR_DEFS[a]} 
                         isOpen={openAttr === a} 
+                        isRequired={tag.a11y?.requires?.includes(a)}
                         onToggle={() => setOpenAttr(openAttr === a ? null : a)} 
                     />
                 ))}
@@ -137,6 +171,7 @@ function SectionTitle({ title, count }) {
             fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
             display: "flex", justifyContent: "space-between", alignItems: "center",
             position: "sticky", top: 0, background: ZINC[0], zIndex: 10,
+            borderBottom: `1px solid ${ZINC[50]}`
         }}>
             <span>{title}</span>
             <span style={{ fontFamily: MONO, fontSize: 13 }}>{count}</span>
@@ -144,7 +179,7 @@ function SectionTitle({ title, count }) {
     );
 }
 
-function AttrItem({ name, def, isOpen, onToggle, isGlobal = false }) {
+function AttrItem({ name, def, isOpen, onToggle, isGlobal = false, isRequired = false }) {
     return (
         <div onClick={onToggle} style={{
             borderBottom: `1px solid ${ZINC[100]}`, padding: "16px 32px",
@@ -155,6 +190,7 @@ function AttrItem({ name, def, isOpen, onToggle, isGlobal = false }) {
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <code style={{ fontSize: 15, fontWeight: 700, color: ZINC[950] }}>{name}</code>
                 {def && <span style={{ fontSize: 10, background: ZINC[100], color: ZINC[500], padding: "2px 8px", borderRadius: 4, fontFamily: MONO }}>{def.t}</span>}
+                {isRequired && <span style={{ fontSize: 10, background: "#ef4444", color: "#fff", padding: "2px 8px", borderRadius: 4, fontFamily: MONO, fontWeight: 700 }}>REQUIRED</span>}
                 <span style={{ marginLeft: "auto", fontSize: 14, color: ZINC[300] }}>{isOpen ? "−" : "+"}</span>
             </div>
             {def && <div style={{ fontSize: 13, color: ZINC[500], marginTop: 6, lineHeight: 1.5 }}>{def.d}</div>}

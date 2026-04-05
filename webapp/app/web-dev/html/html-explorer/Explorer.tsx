@@ -27,10 +27,11 @@ export default function ExplorerTab() {
     const [attrSearch, setAttrSearch] = useState("");
     const [attrFilter, setAttrFilter] = useState("all"); // all | specific | global
     const [attrFamFilter, setAttrFamFilter] = useState("all");
+    const [eventLog, setEventLog] = useState([]);
     
     // Panel Resizing
     const [tagWidth, setTagWidth] = useState(300);
-    const [infoWidth, setInfoWidth] = useState(200);
+    const [infoWidth, setInfoWidth] = useState(240); // Slightly wider for sandbox
     const resizingTag = useRef(false);
     const resizingInfo = useRef(false);
 
@@ -40,7 +41,7 @@ export default function ExplorerTab() {
     useEffect(() => {
         const onMouseMove = (e) => {
             if (resizingTag.current) setTagWidth(Math.max(200, Math.min(600, e.clientX)));
-            if (resizingInfo.current) setInfoWidth(Math.max(150, Math.min(400, e.clientX - tagWidth)));
+            if (resizingInfo.current) setInfoWidth(Math.max(180, Math.min(500, e.clientX - tagWidth)));
         };
         const onMouseUp = () => { resizingTag.current = false; resizingInfo.current = false; document.body.style.cursor = ""; };
         window.addEventListener("mousemove", onMouseMove);
@@ -137,7 +138,9 @@ export default function ExplorerTab() {
         return () => clearTimeout(timer);
     }, [updateLines, filteredTags, rightAttrs, tagWidth, infoWidth]);
 
-    const clearBoth = () => { setSelectedTag(null); setSelectedAttr(null); setLineData([]); };
+    const clearBoth = () => { setSelectedTag(null); setSelectedAttr(null); setLineData([]); setEventLog([]); };
+
+    const activeTagData = useMemo(() => TAGS.find(t => t.t === selectedTag), [selectedTag]);
 
     return (
         <div ref={containerRef} style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative", background: ZINC[50] }}>
@@ -202,7 +205,7 @@ export default function ExplorerTab() {
                                 const isHighlit = highlightedTags && highlightedTags.has(tag.t);
                                 return (
                                     <div key={tag.t} data-tag={tag.t}
-                                        onClick={() => { setSelectedTag(isSel ? null : tag.t); setSelectedAttr(null); }}
+                                        onClick={() => { setSelectedTag(isSel ? null : tag.t); setSelectedAttr(null); setEventLog([]); }}
                                         style={{
                                             padding: "14px 24px", cursor: "pointer",
                                             background: isSel ? ZINC[950] : isHighlit ? ZINC[50] : "transparent",
@@ -230,45 +233,83 @@ export default function ExplorerTab() {
                 <div onMouseDown={onMouseDownTag} style={{ position: "absolute", right: -4, top: 0, bottom: 0, width: 8, cursor: "col-resize", zIndex: 10 }} />
             </div>
 
-            {/* PANEL 2: CONNECTION CENTER */}
+            {/* PANEL 2: CONNECTION CENTER & INSPECTOR */}
             <div style={{
                 width: infoWidth, borderRight: `1px solid ${ZINC[100]}`, display: "flex",
-                flexDirection: "column", alignItems: "center", justifyContent: "center",
-                background: ZINC[100], padding: 24, gap: 24, flexShrink: 0, position: "relative",
+                flexDirection: "column", background: ZINC[50], overflowY: "auto", flexShrink: 0, position: "relative",
             }}>
                 {(selectedTag || selectedAttr) ? (
-                    <div style={{ textAlign: "center", animation: "fadeIn 0.2s ease-out" }}>
-                        {selectedTag && (
-                            <div style={{ marginBottom: 20 }}>
-                                <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, letterSpacing: "0.1em", marginBottom: 8, textTransform: "uppercase" }}>Selected Element</div>
-                                <code style={{ fontSize: 20, fontWeight: 800, color: ZINC[950], background: ZINC[0], border: `1px solid ${ZINC[200]}`, padding: "8px 16px", borderRadius: 8 }}>
+                    <div style={{ padding: 20 }}>
+                        {selectedTag && activeTagData && (
+                            <div style={{ animation: "fadeIn 0.2s ease-out" }}>
+                                <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Quick Inspector</div>
+                                <code style={{ fontSize: 20, fontWeight: 800, color: ZINC[950], display: "block", marginBottom: 16 }}>
                                     &lt;{selectedTag}&gt;
                                 </code>
-                                <div style={{ fontSize: 12, color: ZINC[500], marginTop: 12, fontFamily: MONO }}>
-                                    {(TAGS.find(t => t.t === selectedTag)?.specific.length || 0)} Specific Attrs
+                                
+                                {/* Technical Metadata */}
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
+                                    <div style={{ fontSize: 10, background: ZINC[950], color: "#fff", padding: "2px 8px", borderRadius: 4, fontFamily: MONO }}>{activeTagData.dom}</div>
+                                    <div style={{ fontSize: 10, background: ZINC[200], color: ZINC[700], padding: "2px 8px", borderRadius: 4, fontFamily: MONO }}>{activeTagData.era}</div>
+                                    {activeTagData.a11y?.implicit && (
+                                        <div style={{ fontSize: 10, background: "#eef2ff", color: "#4f46e5", padding: "2px 8px", borderRadius: 4, fontFamily: MONO, border: "1px solid #c7d2fe" }}>role: {activeTagData.a11y.implicit}</div>
+                                    )}
                                 </div>
+
+                                {/* Live Sandbox */}
+                                <div style={{ marginBottom: 20 }}>
+                                    <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, letterSpacing: "0.1em", marginBottom: 8, textTransform: "uppercase" }}>Live Preview</div>
+                                    <div style={{ 
+                                        minHeight: 100, background: "#fff", border: `1px solid ${ZINC[200]}`, borderRadius: 8, 
+                                        display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+                                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)", position: "relative"
+                                    }}>
+                                        <Sandbox tag={selectedTag} events={activeTagData.events} onEvent={(e) => setEventLog(prev => [{ e, t: new Date().toLocaleTimeString() }, ...prev].slice(0, 5))} />
+                                    </div>
+                                </div>
+
+                                {/* Event Log */}
+                                {activeTagData.events.length > 0 && (
+                                    <div style={{ marginBottom: 20 }}>
+                                        <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, letterSpacing: "0.1em", marginBottom: 8, textTransform: "uppercase" }}>Activity Log</div>
+                                        <div style={{ fontSize: 11, fontFamily: MONO, color: ZINC[600], background: ZINC[100], borderRadius: 6, padding: "8px 12px", minHeight: 60, display: "flex", flexDirection: "column", gap: 4 }}>
+                                            {eventLog.length === 0 ? (
+                                                <div style={{ color: ZINC[300], fontStyle: "italic" }}>Interact with element...</div>
+                                            ) : (
+                                                eventLog.map((log, i) => (
+                                                    <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
+                                                        <span style={{ color: ZINC[900] }}>• {log.e}</span>
+                                                        <span style={{ color: ZINC[400], fontSize: 9 }}>{log.t}</span>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                         {selectedAttr && (
-                            <div>
-                                <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, letterSpacing: "0.1em", marginBottom: 8, textTransform: "uppercase" }}>Selected Attribute</div>
-                                <code style={{ fontSize: 18, fontWeight: 800, color: ZINC[950], background: ZINC[0], border: `1px solid ${ZINC[200]}`, padding: "8px 16px", borderRadius: 8 }}>
+                            <div style={{ animation: "fadeIn 0.2s ease-out" }}>
+                                <div style={{ fontSize: 10, color: ZINC[400], fontWeight: 700, letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Global Inspector</div>
+                                <code style={{ fontSize: 18, fontWeight: 800, color: ZINC[950], display: "block", marginBottom: 8 }}>
                                     {selectedAttr}
                                 </code>
-                                <div style={{ fontSize: 12, color: ZINC[500], marginTop: 12, fontFamily: MONO }}>
-                                    Used in {(ATTR_TO_TAGS[selectedAttr] || []).length} Elements
+                                <div style={{ fontSize: 12, color: ZINC[500], fontFamily: MONO }}>
+                                    Present in {(ATTR_TO_TAGS[selectedAttr] || []).length} Elements
                                 </div>
                             </div>
                         )}
                         <button onClick={clearBoth} style={{
-                            marginTop: 32, background: ZINC[950], color: ZINC[0], border: "none",
-                            borderRadius: 6, padding: "10px 24px", cursor: "pointer",
-                            fontFamily: SANS, fontSize: 13, fontWeight: 600,
-                        }}>Clear View</button>
+                            marginTop: 12, width: "100%", background: ZINC[950], color: ZINC[0], border: "none",
+                            borderRadius: 6, padding: "10px 16px", cursor: "pointer",
+                            fontFamily: SANS, fontSize: 12, fontWeight: 600,
+                        }}>Clear Inspector</button>
                     </div>
                 ) : (
-                    <div style={{ textAlign: "center", color: ZINC[400], fontSize: 13, fontFamily: SANS, lineHeight: 1.6, maxWidth: 120 }}>
-                        Select a tag or attribute to visualize connections
+                    <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+                        <div style={{ textAlign: "center", color: ZINC[400], fontSize: 13, fontFamily: SANS, lineHeight: 1.6 }}>
+                            Select a node to inspect architecture
+                        </div>
                     </div>
                 )}
                 
@@ -325,6 +366,8 @@ export default function ExplorerTab() {
                                 const def = ATTR_DEFS[attrName];
                                 const isSel = selectedAttr === attrName;
                                 const isHighlit = highlightedAttrs && highlightedAttrs.has(attrName);
+                                const isRequired = activeTagData?.a11y?.requires?.includes(attrName);
+
                                 return (
                                     <div key={attrName} data-attr={attrName}
                                         onClick={() => { setSelectedAttr(isSel ? null : attrName); setSelectedTag(null); }}
@@ -334,12 +377,14 @@ export default function ExplorerTab() {
                                             borderBottom: `1px solid ${ZINC[50]}`,
                                             borderLeft: isHighlit && !isSel ? `4px solid ${ZINC[950]}` : "4px solid transparent",
                                             transition: "all 0.15s",
+                                            position: "relative"
                                         }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                             <code style={{ fontSize: 16, fontWeight: 700, color: isSel ? ZINC[0] : ZINC[900] }}>
                                                 {attrName}
                                             </code>
                                             {def && <span style={{ fontSize: 10, color: isSel ? ZINC[400] : ZINC[500], background: isSel ? ZINC[800] : ZINC[100], padding: "1px 6px", borderRadius: 4, fontFamily: MONO }}>{def.t}</span>}
+                                            {isRequired && <span style={{ fontSize: 10, color: "#fff", background: "#ef4444", padding: "1px 6px", borderRadius: 4, fontFamily: MONO, fontWeight: 700 }}>REQUIRED</span>}
                                             {GLOBAL_ATTR_NAMES.includes(attrName) && <span style={{ fontSize: 9, color: isSel ? ZINC[500] : ZINC[300], letterSpacing: "0.05em" }}>GLOBAL</span>}
                                         </div>
                                         {def && <div style={{ fontSize: 13, color: isSel ? ZINC[400] : ZINC[500], marginTop: 4, lineHeight: 1.4 }}>{def.d}</div>}
@@ -358,6 +403,67 @@ export default function ExplorerTab() {
             </div>
         </div>
     );
+}
+
+function Sandbox({ tag, events, onEvent }) {
+    const elRef = useRef(null);
+    
+    // Default variations for common elements
+    const getProps = (t) => {
+        const base = {
+            style: { fontFamily: SANS, outline: "none" }
+        };
+        if (t === "input") return { ...base, placeholder: "Type something...", style: { ...base.style, border: "1px solid #ccc", padding: "4px 8px", borderRadius: 4 } };
+        if (t === "textarea") return { ...base, placeholder: "Multi-line input...", style: { ...base.style, border: "1px solid #ccc", padding: "8px", borderRadius: 4, width: "100%", height: 60 } };
+        if (t === "button") return { ...base, children: "Click Me", style: { ...base.style, background: ZINC[950], color: "#fff", border: "none", padding: "6px 12px", borderRadius: 4, cursor: "pointer" } };
+        if (t === "a") return { ...base, children: "Hyperlink", href: "#", style: { ...base.style, color: "#2563eb", textDecoration: "underline" } };
+        if (t === "select") return { ...base, children: <><option>Option 1</option><option>Option 2</option></>, style: { ...base.style, border: "1px solid #ccc", padding: 4, borderRadius: 4 } };
+        if (t === "p") return { ...base, children: "Lorem ipsum dolor sit amet." };
+        if (t === "div") return { ...base, children: "Block Container", style: { ...base.style, border: "1px dashed #ccc", padding: 10 } };
+        if (t === "details") return { ...base, children: [<summary key="s">Click to Expand</summary>, "Hidden content revealed!"] };
+        if (t === "dialog") return { ...base, children: <div style={{ padding: 10 }}>Dialog Content<br/><button style={{ marginTop: 8 }} onClick={(e: any) => (e.target as HTMLElement).closest('dialog')?.close()}>Close</button></div>, open: true, style: { ...base.style, border: "1px solid #ccc", borderRadius: 8, position: "static", margin: 0 } };
+        if (t === "progress") return { ...base, value: 70, max: 100 };
+        if (t === "meter") return { ...base, value: 0.6, min: 0, max: 1, low: 0.3, high: 0.8, optimum: 0.5 };
+        return { ...base, children: `<${t}>` };
+    };
+
+    useEffect(() => {
+        const node = elRef.current;
+        if (!node) return;
+        
+        const handlers = (events || []).map(evt => {
+            const cb = () => onEvent(evt);
+            node.addEventListener(evt, cb);
+            return { evt, cb };
+        });
+
+        // Always log base interactions
+        const baseEvts = ["click", "focus", "blur", "input"];
+        const baseHandlers = baseEvts.map(evt => {
+            const cb = () => onEvent(evt);
+            node.addEventListener(evt, cb);
+            return { evt, cb };
+        });
+
+        return () => {
+            handlers.forEach(h => node.removeEventListener(h.evt, h.cb));
+            baseHandlers.forEach(h => node.removeEventListener(h.evt, h.cb));
+        };
+    }, [tag, events, onEvent]);
+
+    try {
+        const { children, ...props }: any = getProps(tag);
+        const Forbidden = ["script", "html", "head", "body", "meta", "link", "style"];
+        if (Forbidden.includes(tag)) return <div style={{ fontSize: 11, color: ZINC[400] }}>N/A in sandbox</div>;
+        
+        return (
+            <div ref={elRef}>
+                {require("react").createElement(tag, props, children)}
+            </div>
+        );
+    } catch (e) {
+        return <div style={{ fontSize: 11, color: "#f87171" }}>Render Error</div>;
+    }
 }
 
 function groupedSearch(filteredTags) {

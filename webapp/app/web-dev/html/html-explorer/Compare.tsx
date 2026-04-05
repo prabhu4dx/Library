@@ -83,8 +83,10 @@ function CellContent({ tag, attrName, isGlobal }) {
 
 export default function CompareTab() {
     const [selectedTags, setSelectedTags] = useState(["p", "div", "span"]);
-    const [search, setSearch] = useState("");
+    const [tagSearch, setTagSearch] = useState("");
     const [tagCatFilter, setTagCatFilter] = useState("all");
+    const [tagEraFilter, setTagEraFilter] = useState("all");
+    const [tagRoleFilter, setTagRoleFilter] = useState("all");
     const [showGlobal, setShowGlobal] = useState(false);
     const [attrSearch, setAttrSearch] = useState("");
     const [attrFamFilter, setAttrFamFilter] = useState("all");
@@ -109,16 +111,16 @@ export default function CompareTab() {
 
     const tagObjects = useMemo(() => selectedTags.map(t => TAGS.find(x => x.t === t)).filter(Boolean), [selectedTags]);
 
-    const addTag = (t) => {
+    const addTag = (t: string) => {
         if (selectedTags.length >= MAX_COMPARE) return;
         if (!selectedTags.includes(t)) setSelectedTags(s => [...s, t]);
     };
-    const removeTag = (t) => setSelectedTags(s => s.filter(x => x !== t));
+    const removeTag = (t: string) => setSelectedTags(s => s.filter(x => x !== t));
 
     const specAttrs = useMemo(() => {
         const s = new Set<string>();
         tagObjects.forEach(tag => tag.specific.forEach(a => s.add(a)));
-        return [...s].filter(a => {
+        return Array.from(s).filter(a => {
             const def = ATTR_DEFS[a];
             const matchesSearch = !attrSearch.trim() || a.includes(attrSearch.toLowerCase()) || def?.d?.toLowerCase().includes(attrSearch.toLowerCase());
             const matchesFam = attrFamFilter === "all" || def?.f === attrFamFilter;
@@ -136,14 +138,22 @@ export default function CompareTab() {
         });
     }, [showGlobal, attrSearch, attrFamFilter]);
 
+    const allRoles = useMemo(() => {
+        const roles = new Set<string>();
+        TAGS.forEach(t => { if (t.a11y?.implicit) roles.add(t.a11y.implicit); });
+        return Array.from(roles).sort();
+    }, []);
+
     const filteredTags = useMemo(() => {
-        const q = search.toLowerCase();
+        const q = tagSearch.toLowerCase();
         return TAGS.filter(t => {
             const matchesSearch = !q || t.t.includes(q) || t.desc.toLowerCase().includes(q);
             const matchesCat = tagCatFilter === "all" || t.cat === tagCatFilter;
-            return matchesSearch && matchesCat;
+            const matchesEra = tagEraFilter === "all" || t.era === tagEraFilter;
+            const matchesRole = tagRoleFilter === "all" || t.a11y?.implicit === tagRoleFilter;
+            return matchesSearch && matchesCat && matchesEra && matchesRole;
         });
-    }, [search, tagCatFilter]);
+    }, [tagSearch, tagCatFilter, tagEraFilter, tagRoleFilter]);
 
     const groupedSearch = useMemo(() => {
         return CATEGORIES.map(cat => ({
@@ -178,7 +188,7 @@ export default function CompareTab() {
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                        <input value={search} onChange={e => setSearch(e.target.value)}
+                        <input value={tagSearch} onChange={e => setTagSearch(e.target.value)}
                             placeholder="Search tag..."
                             style={{
                                 width: "100%", background: ZINC[50], border: `1px solid ${ZINC[200]}`,
@@ -194,6 +204,28 @@ export default function CompareTab() {
                             <option value="all">All Categories</option>
                             {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
                         </select>
+
+                        <div style={{ display: "flex", gap: 6 }}>
+                            <select value={tagEraFilter} onChange={e => setTagEraFilter(e.target.value)} style={{
+                                flex: 1, background: ZINC[50], border: `1px solid ${ZINC[200]}`,
+                                borderRadius: 6, padding: "8px 12px", fontFamily: MONO, fontSize: 10,
+                                color: ZINC[600], outline: "none", cursor: "pointer",
+                            }}>
+                                <option value="all">Any Era</option>
+                                <option value="HTML4">HTML 4.x</option>
+                                <option value="HTML5">HTML 5.x</option>
+                                <option value="Web Components">Web Comp.</option>
+                            </select>
+
+                            <select value={tagRoleFilter} onChange={e => setTagRoleFilter(e.target.value)} style={{
+                                flex: 1, background: ZINC[50], border: `1px solid ${ZINC[200]}`,
+                                borderRadius: 6, padding: "8px 12px", fontFamily: MONO, fontSize: 10,
+                                color: ZINC[600], outline: "none", cursor: "pointer",
+                            }}>
+                                <option value="all">Any Role</option>
+                                {allRoles.map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
