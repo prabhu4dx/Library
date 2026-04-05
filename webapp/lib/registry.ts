@@ -226,6 +226,24 @@ export const ARTICLES: Article[] = [
     coverPattern: "nodes",
     visualTags: ["Capability Radar", "Comparison Table", "17 Deep-Dives"],
   },
+  {
+    id: "html-explorer",
+    title: "HTML Tag & Attribute Explorer",
+    subtitle: "Interactive Encyclopedia · 110+ Elements",
+    path: "/web-dev/html/html-explorer",
+    category: "uiux",
+    subcategory: "HTML",
+    type: "tool",
+    description:
+      "An interactive mind map and connection explorer for the entire HTML5 specification. Map categories to tags, explore attribute-to-tag relationships, and compare up to 6 elements side-by-side in a technical matrix.",
+    tags: ["110+ Tags", "Attr Matrix", "Mind Map"],
+    date: "April 2026",
+    readingTime: "15 min",
+    accent: "#0a0a0a",
+    accentLight: "#f5f5f5",
+    coverPattern: "nodes",
+    visualTags: ["Radial Mind Map", "Connection SVG", "Compare Matrix"],
+  },
 ];
 
 export const CATEGORY_META: Record<
