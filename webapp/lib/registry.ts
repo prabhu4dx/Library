@@ -244,6 +244,26 @@ export const ARTICLES: Article[] = [
     coverPattern: "nodes",
     visualTags: ["Radial Mind Map", "Connection SVG", "Compare Matrix"],
   },
+  {
+    id: "mind-atlas",
+    title: "Mind Atlas: The Complete Guide to Thinking & Learning",
+    subtitle: "Interactive Cognition Guide · 56+ Models",
+    path: "/learning/learning-and-thinking-styles",
+    category: "uiux",
+    subcategory: "Learning Science",
+    type: "book",
+    description:
+      "A masterwork directory of 26 thinking types and 30 evidence-ranked learning strategies. " +
+      "Features interactive brain maps, dual-process diagrams, Bloom's pyramid, and structured " +
+      "practice toolkits for mastering human cognition.",
+    tags: ["56+ Models", "Learning Science", "Interactive"],
+    date: "April 2026",
+    readingTime: "15 min",
+    accent: "#2563EB",
+    accentLight: "#EFF6FF",
+    coverPattern: "nodes",
+    visualTags: ["26 Thinking Types", "30 Learning Strategies", "Interactive Brain Map"],
+  },
 ];
 
 export const CATEGORY_META: Record<
