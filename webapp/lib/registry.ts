@@ -264,6 +264,26 @@ export const ARTICLES: Article[] = [
     coverPattern: "nodes",
     visualTags: ["26 Thinking Types", "30 Learning Strategies", "Interactive Brain Map"],
   },
+  {
+    id: "outreach-apps-analysis",
+    title: "Agentic Sales Era: 2026 Field Guide",
+    subtitle: "Interactive Market Analysis · 28 Vendors",
+    path: "/business/reports/outreach-apps-analysis",
+    category: "ai",
+    subcategory: "AI Agents",
+    type: "report",
+    description:
+      "A comprehensive interactive field report on the 28 leading vendors in the agentic sales era. " +
+      "Explore market tiers, interactive timelines for 15 years of industry history, pricing maps, " +
+      "and high-fidelity radar charts for comparing autonomous SDRs, copilots, and signal-based outreach platforms.",
+    tags: ["28 Vendors", "Market Analysis", "Radar Compare"],
+    date: "April 2026",
+    readingTime: "35 min",
+    accent: "#dc2626",
+    accentLight: "#FEF2F2",
+    coverPattern: "dims",
+    visualTags: ["Radar Comparison", "Interactive Timeline", "Selection Wizard"],
+  },
 ];
 
 export const CATEGORY_META: Record<
