@@ -284,6 +284,24 @@ export const ARTICLES: Article[] = [
     coverPattern: "dims",
     visualTags: ["Radar Comparison", "Interactive Timeline", "Selection Wizard"],
   },
+  {
+    id: "ia-foundation-book",
+    title: "Information Architecture Foundation",
+    subtitle: "Interactive Book & Labs · 14 Chapters",
+    path: "/uiux/information-architecture/foundation",
+    category: "uiux",
+    subcategory: "Information Architecture",
+    type: "book",
+    description:
+      "A comprehensive interactive masterclass on Information Architecture. Explore 14 chapters of theory and history, then apply your knowledge in 6 dedicated labs—including card sorting, tree testing, and an interactive sitemap builder.",
+    tags: ["14 Chapters", "6 Labs", "SaaS IA"],
+    date: "May 2026",
+    readingTime: "30 min",
+    accent: "#C2185B",
+    accentLight: "#FFF5F8",
+    coverPattern: "nodes",
+    visualTags: ["Card Sorting Lab", "Tree Testing Lab", "Sitemap Builder"],
+  },
 ];
 
 export const CATEGORY_META: Record<
