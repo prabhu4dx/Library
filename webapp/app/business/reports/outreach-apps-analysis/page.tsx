@@ -1890,7 +1890,7 @@ function SelectionWizardSection({ p }) {
 
         return VENDORS.map(v => {
             let score = 0;
-            let reasons = [];
+            const reasons = [];
 
             // Budget
             if (v.priceNum >= low && v.priceNum <= high) { score += 20; reasons.push('Budget fit'); }

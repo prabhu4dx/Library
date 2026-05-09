@@ -1063,9 +1063,9 @@ function rgbToHsv(r, g, b) {
 function rgbToLab(r,g,b){
   const lin=x=>{const v=x/255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);};
   const rl=lin(r),gl=lin(g),bl=lin(b);
-  let X=(rl*0.4124564+gl*0.3575761+bl*0.1804375)/0.95047;
-  let Y=(rl*0.2126729+gl*0.7151522+bl*0.0721750)/1.00000;
-  let Z=(rl*0.0193339+gl*0.1191920+bl*0.9503041)/1.08883;
+  const X=(rl*0.4124564+gl*0.3575761+bl*0.1804375)/0.95047;
+  const Y=(rl*0.2126729+gl*0.7151522+bl*0.0721750)/1.00000;
+  const Z=(rl*0.0193339+gl*0.1191920+bl*0.9503041)/1.08883;
   const f=t=>t>0.008856?Math.cbrt(t):(7.787*t+16/116);
   const fx=f(X),fy=f(Y),fz=f(Z);
   return {L:Math.round(116*fy-16),a:Math.round(500*(fx-fy)),b:Math.round(200*(fy-fz))};
